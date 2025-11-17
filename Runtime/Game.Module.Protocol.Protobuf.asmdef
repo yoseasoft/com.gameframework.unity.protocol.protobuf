@@ -4,6 +4,7 @@
     "references": [
         "Nova.Engine",
         "Nova.Basic",
+        "Nova.Import",
         "Nova.Protobuf",
         "Nova.Protobuf.Extension"
     ],

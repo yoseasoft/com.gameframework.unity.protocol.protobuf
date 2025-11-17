@@ -6,6 +6,7 @@
 /// 功能描述：
 /// </summary>
 
+using System.Reflection;
 using GameEngine;
 using GameEngine.Loader.Symboling;
 
@@ -32,9 +33,20 @@ namespace Game.Module.Protocol.Protobuf
         {
             if (symbol.HasAttribute(typeof(ProtoBuf.Extension.MessageAttribute)))
             {
-                Debugger.Log("消息对象类‘{%s}’自动绑定‘MessageObjectAttribute’特性标签操作完成。", symbol.FullName);
+                int opcode = 0, responseCode = 0;
+                ProtoBuf.Extension.MessageAttribute messageAttr = symbol.ClassType.GetCustomAttribute<ProtoBuf.Extension.MessageAttribute>();
+                if (null != messageAttr)
+                    opcode = messageAttr.Opcode;
 
-                symbol.AddFeatureType(typeof(MessageObjectAttribute));
+                ProtoBuf.Extension.MessageResponseTypeAttribute messageResponseTypeAttr = symbol.ClassType.GetCustomAttribute<ProtoBuf.Extension.MessageResponseTypeAttribute>();
+                if (null != messageResponseTypeAttr)
+                    responseCode = messageResponseTypeAttr.Opcode;
+
+                Debugger.Log("消息对象类‘{%s}’自动绑定‘MessageObjectAttribute’特性标签操作完成，操作码：{%d}，响应码：{%d}。", symbol.FullName, opcode, responseCode);
+
+                // symbol.AddFeatureType(typeof(MessageObjectAttribute));
+                MessageObjectAttribute attribute = new MessageObjectAttribute(opcode, responseCode);
+                symbol.AddFeatureObject(attribute);
             }
         }
     }

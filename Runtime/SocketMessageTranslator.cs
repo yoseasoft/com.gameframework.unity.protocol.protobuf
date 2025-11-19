@@ -6,15 +6,14 @@
 /// 功能描述：
 /// </summary>
 
-using NovaEngine;
-using GameEngine;
+using System.Customize.Extension;
 
 namespace Game.Module.Protocol.Protobuf
 {
     /// <summary>
     /// 套接字类型通道的消息解析器对象类，用于对套接字通道的网络消息数据进行加工
     /// </summary>
-    public abstract class SocketMessageTranslator : IMessageTranslator
+    public abstract class SocketMessageTranslator : GameEngine.IMessageTranslator
     {
         /// <summary>
         /// 消息操作码的长度，以字节为单位
@@ -31,7 +30,7 @@ namespace Game.Module.Protocol.Protobuf
             ProtoBuf.Extension.IMessage msg = message as ProtoBuf.Extension.IMessage;
             GameEngine.Debugger.Assert(null != msg, NovaEngine.ErrorText.InvalidArguments);
 
-            int opcode = NetworkHandler.Instance.GetOpcodeByMessageType(message.GetType());
+            int opcode = GameEngine.NetworkHandler.Instance.GetOpcodeByMessageType(message.GetType());
             byte[] msgBytes = ProtoBuf.Extension.ProtobufHelper.ToBytes(message);
 
             byte[] buffer = new byte[msgBytes.Length + OpcodeSize];
@@ -54,7 +53,7 @@ namespace Game.Module.Protocol.Protobuf
             // short opcode = System.BitConverter.ToInt16(buffer, 0);
             // opcode = System.Net.IPAddress.NetworkToHostOrder(opcode);
             int opcode = buffer.ReadBigUInt16(0);
-            System.Type messageType = NetworkHandler.Instance.GetMessageClassByType(opcode);
+            System.Type messageType = GameEngine.NetworkHandler.Instance.GetMessageClassByType(opcode);
 
             object message = ProtoBuf.Extension.ProtobufHelper.FromBytes(messageType, buffer, OpcodeSize, buffer.Length - OpcodeSize);
 
